@@ -72,6 +72,10 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    experts: Expert;
+    services: Service;
+    offers: Offer;
+    reviews: Review;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +98,10 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    experts: ExpertsSelect<false> | ExpertsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    offers: OffersSelect<false> | OffersSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -159,7 +167,16 @@ export interface Page {
   id: number;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'heroSlider';
+    slides?:
+      | {
+          title: string;
+          subtitle?: string | null;
+          desc?: string | null;
+          img: number | Media;
+          id?: string | null;
+        }[]
+      | null;
     richText?: {
       root: {
         type: string;
@@ -208,8 +225,15 @@ export interface Page {
     | ArchiveBlock
     | FormBlock
     | ExpertsOrbitBlock
+    | WhyChooseUsBlock
     | ServicesGridBlock
     | OffersBlock
+    | ServicesCatalogBlock
+    | GroomJourneyBlock
+    | AcademyGridBlock
+    | StoreShowcaseBlock
+    | ReviewsBlockBlock
+    | LocationContactBlock
   )[];
   meta?: {
     title?: string | null;
@@ -220,56 +244,6 @@ export interface Page {
     description?: string | null;
   };
   publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: number;
-  title: string;
-  heroImage?: (number | null) | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (number | User)[] | null;
-  populatedAuthors?:
-    | {
-        id?: string | null;
-        name?: string | null;
-      }[]
-    | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -397,6 +371,56 @@ export interface FolderInterface {
   folderType?: 'media'[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  heroImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -798,17 +822,72 @@ export interface ExpertsOrbitBlock {
   heading?: string | null;
   subheading?: string | null;
   centerImage: number | Media;
-  experts?:
+  /**
+   * Select the experts to showcase in the orbit.
+   */
+  experts: (number | Expert)[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'expertsOrbit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experts".
+ */
+export interface Expert {
+  id: number;
+  name: string;
+  slug?: string | null;
+  /**
+   * E.g., Senior Laser Specialist
+   */
+  title: string;
+  /**
+   * Short biography about the expert.
+   */
+  bio: string;
+  /**
+   * Years of experience in the field.
+   */
+  experienceYears: number;
+  /**
+   * Profile image for the expert.
+   */
+  image: number | Media;
+  /**
+   * Portfolio gallery for this expert.
+   */
+  gallery?:
     | {
-        name: string;
-        title?: string | null;
         image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhyChooseUsBlock".
+ */
+export interface WhyChooseUsBlock {
+  heading: string;
+  description?: string | null;
+  features?:
+    | {
+        title: string;
+        text: string;
+        /**
+         * Lucide Icon name (e.g. ShieldCheck, Sparkles, UserCheck)
+         */
+        icon?: string | null;
         id?: string | null;
       }[]
     | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'expertsOrbit';
+  blockType: 'whyChooseUs';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -839,23 +918,223 @@ export interface ServicesGridBlock {
 export interface OffersBlock {
   heading?: string | null;
   subheading?: string | null;
-  offers?:
+  /**
+   * Select the active offers to display.
+   */
+  offers: (number | Offer)[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'offersBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offers".
+ */
+export interface Offer {
+  id: number;
+  title: string;
+  slug?: string | null;
+  description: string;
+  image: number | Media;
+  startDate?: string | null;
+  expirationDate: string;
+  newPrice: number;
+  oldPrice?: number | null;
+  currency?: string | null;
+  limitedTag?: string | null;
+  /**
+   * Link this offer to a specific service landing page.
+   */
+  relatedService?: (number | null) | Service;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  slug?: string | null;
+  category: 'laser' | 'skin' | 'hair' | 'other';
+  /**
+   * Lucide React icon name (e.g., Activity, Smile, Scissors, Gem)
+   */
+  icon?: string | null;
+  /**
+   * Displayed on the home page service card.
+   */
+  shortDescription: string;
+  /**
+   * Detailed description for the service landing page.
+   */
+  fullDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Starting price (e.g. 200, or "تبدأ من 50")
+   */
+  basePrice?: string | null;
+  currency?: string | null;
+  /**
+   * Optional sub-packages or specific parts (e.g. Full body, Half body)
+   */
+  packages?:
+    | {
+        name: string;
+        price: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesCatalogBlock".
+ */
+export interface ServicesCatalogBlock {
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Select the services to feature in the catalog.
+   */
+  services: (number | Service)[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'servicesCatalog';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GroomJourneyBlock".
+ */
+export interface GroomJourneyBlock {
+  subtitle?: string | null;
+  heading?: string | null;
+  description?: string | null;
+  checklist?:
     | {
         title: string;
         description?: string | null;
-        image?: (number | null) | Media;
-        oldPrice?: number | null;
-        newPrice: number;
-        currency?: string | null;
-        limitedTag?: string | null;
-        expiryDate?: string | null;
-        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  ctaText?: string | null;
+  image: number | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'groomJourney';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AcademyGridBlock".
+ */
+export interface AcademyGridBlock {
+  subtitle?: string | null;
+  heading?: string | null;
+  description?: string | null;
+  courses?:
+    | {
+        category: string;
+        title: string;
+        icon: string;
+        special?: boolean | null;
         id?: string | null;
       }[]
     | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'offersBlock';
+  blockType: 'academyGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StoreShowcaseBlock".
+ */
+export interface StoreShowcaseBlock {
+  heading?: string | null;
+  subtitle?: string | null;
+  giftTitle?: string | null;
+  giftDesc?: string | null;
+  categories?:
+    | {
+        name: string;
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'storeShowcase';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ReviewsBlockBlock".
+ */
+export interface ReviewsBlockBlock {
+  heading?: string | null;
+  /**
+   * Select the reviews to showcase.
+   */
+  reviews: (number | Review)[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'reviewsBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  /**
+   * Name of the reviewer.
+   */
+  name: string;
+  /**
+   * Service received (e.g., ليزر, تجهيز عريس).
+   */
+  service?: string | null;
+  rating: number;
+  text: string;
+  /**
+   * Only published reviews will appear on the site.
+   */
+  status?: ('draft' | 'published') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LocationContactBlock".
+ */
+export interface LocationContactBlock {
+  heading?: string | null;
+  locationTitle?: string | null;
+  locationText?: string | null;
+  contactTitle?: string | null;
+  contactText?: string | null;
+  hoursTitle?: string | null;
+  weekdaysText?: string | null;
+  weekdaysHours?: string | null;
+  fridayText?: string | null;
+  fridayHours?: string | null;
+  mapEmbedUrl: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'locationContact';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1068,6 +1347,22 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'experts';
+        value: number | Expert;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'offers';
+        value: number | Offer;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1139,6 +1434,15 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         type?: T;
+        slides?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              desc?: T;
+              img?: T;
+              id?: T;
+            };
         richText?: T;
         links?:
           | T
@@ -1166,8 +1470,15 @@ export interface PagesSelect<T extends boolean = true> {
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
         expertsOrbit?: T | ExpertsOrbitBlockSelect<T>;
+        whyChooseUs?: T | WhyChooseUsBlockSelect<T>;
         servicesGrid?: T | ServicesGridBlockSelect<T>;
         offersBlock?: T | OffersBlockSelect<T>;
+        servicesCatalog?: T | ServicesCatalogBlockSelect<T>;
+        groomJourney?: T | GroomJourneyBlockSelect<T>;
+        academyGrid?: T | AcademyGridBlockSelect<T>;
+        storeShowcase?: T | StoreShowcaseBlockSelect<T>;
+        reviewsBlock?: T | ReviewsBlockBlockSelect<T>;
+        locationContact?: T | LocationContactBlockSelect<T>;
       };
   meta?:
     | T
@@ -1275,12 +1586,23 @@ export interface ExpertsOrbitBlockSelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
   centerImage?: T;
-  experts?:
+  experts?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhyChooseUsBlock_select".
+ */
+export interface WhyChooseUsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  features?:
     | T
     | {
-        name?: T;
         title?: T;
-        image?: T;
+        text?: T;
+        icon?: T;
         id?: T;
       };
   id?: T;
@@ -1314,20 +1636,106 @@ export interface ServicesGridBlockSelect<T extends boolean = true> {
 export interface OffersBlockSelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
-  offers?:
+  offers?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesCatalogBlock_select".
+ */
+export interface ServicesCatalogBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subheading?: T;
+  services?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GroomJourneyBlock_select".
+ */
+export interface GroomJourneyBlockSelect<T extends boolean = true> {
+  subtitle?: T;
+  heading?: T;
+  description?: T;
+  checklist?:
     | T
     | {
         title?: T;
         description?: T;
-        image?: T;
-        oldPrice?: T;
-        newPrice?: T;
-        currency?: T;
-        limitedTag?: T;
-        expiryDate?: T;
-        link?: T;
         id?: T;
       };
+  ctaText?: T;
+  image?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AcademyGridBlock_select".
+ */
+export interface AcademyGridBlockSelect<T extends boolean = true> {
+  subtitle?: T;
+  heading?: T;
+  description?: T;
+  courses?:
+    | T
+    | {
+        category?: T;
+        title?: T;
+        icon?: T;
+        special?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StoreShowcaseBlock_select".
+ */
+export interface StoreShowcaseBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subtitle?: T;
+  giftTitle?: T;
+  giftDesc?: T;
+  categories?:
+    | T
+    | {
+        name?: T;
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ReviewsBlockBlock_select".
+ */
+export interface ReviewsBlockBlockSelect<T extends boolean = true> {
+  heading?: T;
+  reviews?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LocationContactBlock_select".
+ */
+export interface LocationContactBlockSelect<T extends boolean = true> {
+  heading?: T;
+  locationTitle?: T;
+  locationText?: T;
+  contactTitle?: T;
+  contactText?: T;
+  hoursTitle?: T;
+  weekdaysText?: T;
+  weekdaysHours?: T;
+  fridayText?: T;
+  fridayHours?: T;
+  mapEmbedUrl?: T;
   id?: T;
   blockName?: T;
 }
@@ -1498,6 +1906,82 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experts_select".
+ */
+export interface ExpertsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  title?: T;
+  bio?: T;
+  experienceYears?: T;
+  image?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  category?: T;
+  icon?: T;
+  shortDescription?: T;
+  fullDescription?: T;
+  basePrice?: T;
+  currency?: T;
+  packages?:
+    | T
+    | {
+        name?: T;
+        price?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offers_select".
+ */
+export interface OffersSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  image?: T;
+  startDate?: T;
+  expirationDate?: T;
+  newPrice?: T;
+  oldPrice?: T;
+  currency?: T;
+  limitedTag?: T;
+  relatedService?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  name?: T;
+  service?: T;
+  rating?: T;
+  text?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

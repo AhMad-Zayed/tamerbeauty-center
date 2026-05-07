@@ -10,6 +10,13 @@ import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { ExpertsOrbit } from '../../blocks/ExpertsOrbit/config'
 import { ServicesGrid } from '../../blocks/ServicesGrid/config'
 import { OffersBlock } from '../../blocks/OffersBlock/config'
+import { ServicesCatalog } from '../../blocks/ServicesCatalog/config'
+import { GroomJourney } from '../../blocks/GroomJourney/config'
+import { AcademyGrid } from '../../blocks/AcademyGrid/config'
+import { StoreShowcase } from '../../blocks/StoreShowcase/config'
+import { ReviewsBlock } from '../../blocks/ReviewsBlock/config'
+import { LocationContact } from '../../blocks/LocationContact/config'
+import { WhyChooseUs } from '../../blocks/WhyChooseUs/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -75,7 +82,23 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock, ExpertsOrbit, ServicesGrid, OffersBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                ExpertsOrbit,
+                WhyChooseUs,
+                ServicesGrid,
+                OffersBlock,
+                ServicesCatalog,
+                GroomJourney,
+                AcademyGrid,
+                StoreShowcase,
+                ReviewsBlock,
+                LocationContact,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,

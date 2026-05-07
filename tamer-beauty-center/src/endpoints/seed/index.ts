@@ -11,6 +11,10 @@ import { post2 } from './post-2'
 import { post3 } from './post-3'
 
 const collections: CollectionSlug[] = [
+  'experts',
+  'services',
+  'offers',
+  'reviews',
   'categories',
   'media',
   'pages',
@@ -200,13 +204,36 @@ export const seed = async ({
     data: contactFormData,
   })
 
+  payload.logger.info(`— Seeding experts, services, offers, reviews...`)
+  const { expertsData, servicesData, offersData, reviewsData } = await import('./new-collections')
+
+  const expertsDocs = await Promise.all(
+    expertsData.map((exp) => payload.create({ collection: 'experts', data: { ...exp, image: image2Doc.id } }))
+  )
+  const servicesDocs = await Promise.all(
+    servicesData.map((srv) => payload.create({ collection: 'services', data: srv as any }))
+  )
+  const offersDocs = await Promise.all(
+    offersData.map((off) => payload.create({ collection: 'offers', data: { ...off, image: image1Doc.id } }))
+  )
+  const reviewsDocs = await Promise.all(
+    reviewsData.map((rev) => payload.create({ collection: 'reviews', data: rev as any }))
+  )
+
   payload.logger.info(`— Seeding pages...`)
 
   const [_, contactPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+      data: home({ 
+        heroImage: imageHomeDoc, 
+        metaImage: image2Doc,
+        expertsIds: expertsDocs.map(e => e.id),
+        servicesIds: servicesDocs.map(s => s.id),
+        offersIds: offersDocs.map(o => o.id),
+        reviewsIds: reviewsDocs.map(r => r.id),
+      }),
     }),
     payload.create({
       collection: 'pages',

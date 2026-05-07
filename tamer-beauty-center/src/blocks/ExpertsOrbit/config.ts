@@ -28,30 +28,15 @@ export const ExpertsOrbit: Block = {
     },
     {
       name: 'experts',
-      type: 'array',
-      label: 'Expert Profiles (exactly 6 for orbit)',
+      type: 'relationship',
+      relationTo: 'experts',
+      hasMany: true,
+      required: true,
       minRows: 3,
       maxRows: 6,
-      fields: [
-        {
-          name: 'name',
-          type: 'text',
-          label: 'Name',
-          required: true,
-        },
-        {
-          name: 'title',
-          type: 'text',
-          label: 'Job Title',
-        },
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Profile Image',
-          required: true,
-        },
-      ],
+      admin: {
+        description: 'Select the experts to showcase in the orbit.',
+      },
     },
   ],
 }

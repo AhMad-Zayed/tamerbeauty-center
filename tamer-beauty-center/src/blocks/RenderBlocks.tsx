@@ -10,6 +10,13 @@ import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { ExpertsOrbitBlock } from '@/blocks/ExpertsOrbit/Component'
 import { ServicesGridBlock } from '@/blocks/ServicesGrid/Component'
 import { OffersBlockComponent } from '@/blocks/OffersBlock/Component'
+import { ServicesCatalogBlock } from '@/blocks/ServicesCatalog/Component'
+import { GroomJourneyBlock } from '@/blocks/GroomJourney/Component'
+import { AcademyGridBlock } from '@/blocks/AcademyGrid/Component'
+import { StoreShowcaseBlock } from '@/blocks/StoreShowcase/Component'
+import { ReviewsBlockComponent } from '@/blocks/ReviewsBlock/Component'
+import { LocationContactComponent } from '@/blocks/LocationContact/Component'
+import { WhyChooseUsBlock } from '@/blocks/WhyChooseUs/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -20,6 +27,13 @@ const blockComponents = {
   expertsOrbit: ExpertsOrbitBlock,
   servicesGrid: ServicesGridBlock,
   offersBlock: OffersBlockComponent,
+  servicesCatalog: ServicesCatalogBlock,
+  groomJourney: GroomJourneyBlock,
+  academyGrid: AcademyGridBlock,
+  storeShowcase: StoreShowcaseBlock,
+  reviewsBlock: ReviewsBlockComponent,
+  locationContact: LocationContactComponent,
+  whyChooseUs: WhyChooseUsBlock,
 }
 
 export const RenderBlocks: React.FC<{
@@ -40,8 +54,7 @@ export const RenderBlocks: React.FC<{
 
             if (Block) {
               return (
-                <div className="my-16" key={index}>
-                  {/* @ts-expect-error there may be some mismatch between the expected types here */}
+                <div key={index}>
                   <Block {...block} disableInnerContainer />
                 </div>
               )

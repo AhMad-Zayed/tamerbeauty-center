@@ -35,12 +35,49 @@ export const hero: Field = {
           label: 'Low Impact',
           value: 'lowImpact',
         },
+        {
+          label: 'Hero Slider',
+          value: 'heroSlider',
+        },
       ],
       required: true,
     },
     {
+      name: 'slides',
+      type: 'array',
+      label: 'Slider Items',
+      admin: {
+        condition: (_, { type } = {}) => type === 'heroSlider',
+      },
+      minRows: 1,
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'subtitle',
+          type: 'text',
+        },
+        {
+          name: 'desc',
+          type: 'textarea',
+        },
+        {
+          name: 'img',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+        },
+      ],
+    },
+    {
       name: 'richText',
       type: 'richText',
+      admin: {
+        condition: (_, { type } = {}) => type !== 'heroSlider',
+      },
       editor: lexicalEditor({
         features: ({ rootFeatures }) => {
           return [

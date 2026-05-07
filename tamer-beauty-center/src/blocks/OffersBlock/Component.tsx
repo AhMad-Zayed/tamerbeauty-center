@@ -1,188 +1,87 @@
 'use client'
-import React, { useRef, useState } from 'react'
-import { Media } from '@/components/Media'
-import type { Media as MediaType } from '@/payload-types'
+import React from 'react'
+import { Percent, Clock } from 'lucide-react'
+import Link from 'next/link'
 
-// Local type — superseded after `payload generate:types`
-export type OfferCard = {
-  title: string
-  description?: string | null
-  image?: number | MediaType | null
-  oldPrice?: number | null
-  newPrice: number
-  currency?: string | null
-  limitedTag?: string | null
-  expiryDate?: string | null
-  link?: string | null
-  id?: string | null
-}
-
-export type OffersBlockProps = {
-  heading?: string | null
-  subheading?: string | null
-  offers?: OfferCard[] | null
-  blockType: 'offersBlock'
-  blockName?: string | null
-  id?: string | null
-}
-
-function formatPrice(price: number, currency = 'ر.س') {
-  return `${price.toLocaleString('ar-SA')} ${currency}`
-}
-
-export const OffersBlockComponent: React.FC<OffersBlockProps> = ({
-  heading,
-  subheading,
-  offers,
-}) => {
-  const cards = offers ?? []
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  const scrollTo = (index: number) => {
-    const el = scrollRef.current
-    if (!el) return
-    const card = el.children[index] as HTMLElement
-    if (!card) return
-    el.scrollTo({ left: card.offsetLeft - 24, behavior: 'smooth' })
-    setActiveIndex(index)
+export const OffersBlockComponent: React.FC<any> = ({ heading, subheading, offers }) => {
+  const calculateDaysLeft = (dateString: string) => {
+    if (!dateString) return 0
+    const diff = new Date(dateString).getTime() - new Date().getTime()
+    return Math.ceil(diff / (1000 * 3600 * 24))
   }
 
   return (
-    <section className="py-24 overflow-hidden">
-      <div className="container">
-        {/* ── Section header ── */}
-        {(heading || subheading) && (
-          <div className="flex items-end justify-between mb-10" dir="rtl">
-            <div>
-              {heading && (
-                <h2 className="font-display text-4xl md:text-5xl tracking-tighter text-white mb-2">
-                  {heading}
-                </h2>
-              )}
-              {subheading && (
-                <p className="text-white/60 text-lg">{subheading}</p>
-              )}
-            </div>
-
-            {/* Dot navigation */}
-            {cards.length > 1 && (
-              <div className="flex items-center gap-2 pb-1">
-                {cards.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => scrollTo(i)}
-                    aria-label={`الانتقال إلى العرض ${i + 1}`}
-                    className={`rounded-full transition-all duration-300 ${
-                      i === activeIndex
-                        ? 'w-6 h-2 bg-primary-neon'
-                        : 'w-2 h-2 bg-white/20 hover:bg-white/40'
-                    }`}
-                  />
-                ))}
-              </div>
+    <section className="py-32 bg-black relative" dir="rtl">
+      <div className="container mx-auto px-6">
+        <div className="flex items-end justify-between mb-24">
+          <div>
+            <h2 className="text-5xl md:text-8xl font-black mb-4 tracking-tighter text-white">{heading}</h2>
+            {subheading && (
+              <p className="text-[#c3f400] font-bold tracking-[0.3em] uppercase text-sm">
+                {subheading}
+              </p>
             )}
           </div>
-        )}
-      </div>
+          <Percent size={80} className="text-[#c3f400] opacity-20 hidden md:block" />
+        </div>
 
-      {/* ── Horizontally scrollable card track ── */}
-      {/* Padding-x is applied on the container but the scroll area bleeds out */}
-      <div
-        ref={scrollRef}
-        className="flex gap-5 overflow-x-auto scroll-smooth pb-4 px-[max(1rem,calc((100vw-1280px)/2+1.5rem))] snap-x snap-mandatory"
-        style={{ scrollbarWidth: 'none' }}
-        onScroll={(e) => {
-          const el = e.currentTarget
-          const cardWidth = (el.children[0] as HTMLElement)?.offsetWidth ?? 340
-          setActiveIndex(Math.round(el.scrollLeft / (cardWidth + 20)))
-        }}
-      >
-        {cards.map((offer, index) => {
-          const hasImage = offer.image && typeof offer.image === 'object'
-          const currency = offer.currency ?? 'ر.س'
-
-          return (
-            <div
-              key={offer.id ?? index}
-              className="relative flex-none w-[300px] md:w-[340px] rounded-2xl overflow-hidden glass-card border border-white/[0.06] snap-start group"
-              dir="rtl"
-            >
-              {/* ── LIMITED TIME tag (top-left / RTL: top-right visually) ── */}
-              {offer.limitedTag && (
-                <div className="absolute top-4 right-4 z-20">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-primary-neon text-[#283500] shadow-neon-glow">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#283500] animate-pulse" />
-                    {offer.limitedTag}
-                  </span>
-                </div>
-              )}
-
-              {/* ── Card image ── */}
-              <div className="relative h-48 w-full overflow-hidden">
-                {hasImage ? (
-                  <>
-                    <Media
-                      fill
-                      imgClassName="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                      resource={offer.image as MediaType}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1c1b1b] to-transparent" />
-                  </>
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-surface-container-low to-[#252525]" />
-                )}
-              </div>
-
-              {/* ── Card body ── */}
-              <div className="p-5">
-                <h3 className="font-display text-lg text-white tracking-tight leading-snug mb-2">
-                  {offer.title}
-                </h3>
-
-                {offer.description && (
-                  <p className="text-white/50 text-sm leading-relaxed mb-4 line-clamp-2">
-                    {offer.description}
-                  </p>
-                )}
-
-                {/* ── Pricing ── */}
-                <div className="flex items-baseline gap-3 mb-1">
-                  {/* New price — bold neon yellow (secondary color) */}
-                  <span className="text-2xl font-bold text-secondary">
-                    {formatPrice(offer.newPrice, currency)}
-                  </span>
-
-                  {/* Old price — struck-through */}
-                  {offer.oldPrice != null && (
-                    <span className="text-sm text-white/40 line-through decoration-white/40">
-                      {formatPrice(offer.oldPrice, currency)}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {offers &&
+            offers.map((relationData: any, i: number) => {
+              const offer = relationData.value || relationData
+              if (!offer?.title) return null
+              
+              const imgUrl = typeof offer.image === 'string' ? offer.image : offer.image?.url || ''
+              const daysLeft = calculateDaysLeft(offer.expirationDate)
+              
+              return (
+                <Link
+                  href={`/offers/${offer.slug || ''}`}
+                  key={i}
+                  className="group relative bg-[#0a0a0a] rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-[#c3f400]/50 transition-all duration-700 hover:-translate-y-4 block"
+                >
+                  <div className="absolute top-6 left-6 z-20 bg-black/80 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 flex items-center gap-2">
+                    <Clock size={16} className="text-[#c3f400]" />
+                    <span className="text-white font-bold text-xs">
+                      {daysLeft > 0 ? `ينتهي خلال ${daysLeft} يوم` : 'ينتهي قريباً'}
                     </span>
+                  </div>
+                  {offer.limitedTag && (
+                    <div className="absolute top-6 right-6 z-20 bg-[#c3f400] text-black px-5 py-2.5 rounded-full font-black text-xs uppercase tracking-tighter">
+                      {offer.limitedTag}
+                    </div>
                   )}
-                </div>
-
-                {/* Expiry label */}
-                {offer.expiryDate && (
-                  <p className="text-white/40 text-xs mb-4">{offer.expiryDate}</p>
-                )}
-
-                {/* CTA */}
-                {offer.link ? (
-                  <a
-                    href={offer.link}
-                    className="neon-button w-full flex items-center justify-center text-sm mt-3"
-                  >
-                    احجز الآن
-                  </a>
-                ) : (
-                  <button className="neon-button w-full flex items-center justify-center text-sm mt-3">
-                    احجز الآن
-                  </button>
-                )}
-              </div>
-            </div>
-          )
-        })}
+                  <div className="h-80 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent z-10" />
+                    {imgUrl && (
+                      <img
+                        src={imgUrl}
+                        alt={offer.title}
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+                      />
+                    )}
+                  </div>
+                  <div className="p-10 relative z-20">
+                    <h3 className="text-3xl font-black mb-4 text-white group-hover:text-[#c3f400] transition-colors">{offer.title}</h3>
+                    {offer.description && (
+                      <p className="text-neutral-400 mb-6">{offer.description}</p>
+                    )}
+                    <div className="flex items-end gap-6">
+                      <div className="text-5xl font-black text-[#c3f400]">
+                        {offer.newPrice}
+                        <span className="text-2xl ml-2 text-[#c3f400]/60">{offer.currency}</span>
+                      </div>
+                      {offer.oldPrice && (
+                        <div className="text-2xl text-neutral-600 line-through font-bold mb-1">
+                          {offer.oldPrice}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+        </div>
       </div>
     </section>
   )

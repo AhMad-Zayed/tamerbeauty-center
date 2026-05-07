@@ -21,61 +21,13 @@ export const OffersBlock: Block = {
     },
     {
       name: 'offers',
-      type: 'array',
-      label: 'Offer Cards',
-      minRows: 1,
-      fields: [
-        {
-          name: 'title',
-          type: 'text',
-          label: 'Offer Title',
-          required: true,
-        },
-        {
-          name: 'description',
-          type: 'textarea',
-          label: 'Short Description',
-        },
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Offer Image',
-        },
-        {
-          name: 'oldPrice',
-          type: 'number',
-          label: 'Old Price (SAR)',
-        },
-        {
-          name: 'newPrice',
-          type: 'number',
-          label: 'New Price (SAR)',
-          required: true,
-        },
-        {
-          name: 'currency',
-          type: 'text',
-          label: 'Currency Symbol',
-          defaultValue: 'ر.س',
-        },
-        {
-          name: 'limitedTag',
-          type: 'text',
-          label: '"Limited Time" Tag Text',
-          defaultValue: 'عرض محدود',
-        },
-        {
-          name: 'expiryDate',
-          type: 'text',
-          label: 'Expiry Label (e.g. ينتهي 30 مايو)',
-        },
-        {
-          name: 'link',
-          type: 'text',
-          label: 'CTA URL',
-        },
-      ],
+      type: 'relationship',
+      relationTo: 'offers',
+      hasMany: true,
+      required: true,
+      admin: {
+        description: 'Select the active offers to display.',
+      },
     },
   ],
 }
