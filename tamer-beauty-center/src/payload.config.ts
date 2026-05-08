@@ -19,6 +19,8 @@ import { Experts } from './collections/Experts'
 import { Services } from './collections/Services'
 import { Offers } from './collections/Offers'
 import { Reviews } from './collections/Reviews'
+import { StoreCategories } from './collections/StoreCategories'
+import { Products } from './collections/Products'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,7 +49,7 @@ export default buildConfig({
       connectionString: "postgresql://postgres:password123@127.0.0.1:5432/postgres",
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Experts, Services, Offers, Reviews],
+  collections: [Pages, Posts, Media, Categories, Users, Experts, Services, Offers, Reviews, StoreCategories, Products],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins,

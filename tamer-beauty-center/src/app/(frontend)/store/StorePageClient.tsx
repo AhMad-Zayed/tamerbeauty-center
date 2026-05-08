@@ -2,67 +2,42 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 
-const CATEGORIES = [
-  'جميع المنتجات',
-  'عناية الوجه',
-  'عناية الجسم',
-  'صحة القدمين',
-  'علاجات الشعر',
-  'عطور نادرة',
-  'إكسسوارات فاخرة',
-]
+type Product = {
+  id: string
+  name: string
+  category?: { title?: string } | string
+  description?: string
+  price: string
+  currency: string
+  image: { url?: string } | string
+  isFeatured?: boolean
+}
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: 'سيروم التجديد الخلوي',
-    category: 'إصدار حصري',
-    description: 'تركيبة غنية بالببتيدات النشطة لترميم طبقات الجلد العميقة وتعزيز النضارة.',
-    price: '245.00',
-    currency: 'ر.س',
-    image: '/store-serum.png',
-    isFeatured: true,
-  },
-  {
-    id: 2,
-    name: 'كريم "أوبسيديان" الليلي',
-    category: 'عناية البشرة',
-    price: '180.00',
-    currency: 'ر.س',
-    image: '/store-cream.png',
-    isFeatured: false,
-  },
-  {
-    id: 3,
-    name: 'إكسير الشعر العضوي',
-    category: 'علاجات الشعر',
-    price: '95.00',
-    currency: 'ر.س',
-    image: '/store-elixir.png',
-    isFeatured: false,
-  },
-  {
-    id: 4,
-    name: 'مقشر الجسم البركاني',
-    category: 'عناية الجسم',
-    price: '110.00',
-    currency: 'ر.س',
-    image: '/store-scrub.png',
-    isFeatured: false,
-  },
-  {
-    id: 5,
-    name: 'عطر العود "سيجنتشر"',
-    category: 'العطور',
-    price: '320.00',
-    currency: 'ر.س',
-    image: '/store-perfume.png',
-    isFeatured: false,
-  },
-]
+type StorePageClientProps = {
+  initialProducts: any[]
+  initialCategories: string[]
+}
 
-export const StorePageClient: React.FC = () => {
+export const StorePageClient: React.FC<StorePageClientProps> = ({ initialProducts, initialCategories }) => {
+  const allCategories = ['جميع المنتجات', ...initialCategories]
   const [activeCategory, setActiveCategory] = useState('جميع المنتجات')
+
+  // Map raw CMS products to our format
+  const products: Product[] = initialProducts.map((p) => ({
+    id: p.id,
+    name: p.name,
+    category: typeof p.category === 'object' ? p.category?.title : p.category,
+    description: p.description,
+    price: p.price,
+    currency: p.currency,
+    image: typeof p.image === 'object' ? p.image?.url : p.image,
+    isFeatured: p.isFeatured,
+  }))
+
+  const filteredProducts = products.filter((p) => {
+    if (activeCategory === 'جميع المنتجات') return true
+    return p.category === activeCategory
+  })
 
   return (
     <div
@@ -92,7 +67,7 @@ export const StorePageClient: React.FC = () => {
               msOverflowStyle: 'none',
             }}
           >
-            {CATEGORIES.map((cat) => (
+            {allCategories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
@@ -112,7 +87,7 @@ export const StorePageClient: React.FC = () => {
         {/* Featured Products Grid */}
         <section className="w-full px-6 md:px-12 max-w-[1920px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 auto-rows-[450px]">
-            {PRODUCTS.map((product) => {
+            {filteredProducts.map((product) => {
               if (product.isFeatured) {
                 return (
                   <article

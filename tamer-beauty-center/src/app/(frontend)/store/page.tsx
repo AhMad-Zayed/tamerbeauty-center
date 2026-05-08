@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 import { StorePageClient } from './StorePageClient'
 
 export const metadata: Metadata = {
@@ -13,6 +15,23 @@ export const metadata: Metadata = {
   },
 }
 
-export default function StorePage() {
-  return <StorePageClient />
+export default async function StorePage() {
+  const payload = await getPayload({ config: configPromise })
+
+  const productsRes = await payload.find({
+    collection: 'products',
+    depth: 1,
+    limit: 100,
+  })
+
+  const categoriesRes = await payload.find({
+    collection: 'store-categories',
+    depth: 0,
+    limit: 100,
+  })
+
+  const products = productsRes.docs
+  const categories = categoriesRes.docs.map((doc) => doc.title)
+
+  return <StorePageClient initialProducts={products} initialCategories={categories} />
 }

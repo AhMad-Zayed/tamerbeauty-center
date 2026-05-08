@@ -76,6 +76,8 @@ export interface Config {
     services: Service;
     offers: Offer;
     reviews: Review;
+    'store-categories': StoreCategory;
+    products: Product;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -102,6 +104,8 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     offers: OffersSelect<false> | OffersSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    'store-categories': StoreCategoriesSelect<false> | StoreCategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1138,6 +1142,39 @@ export interface LocationContactBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "store-categories".
+ */
+export interface StoreCategory {
+  id: number;
+  title: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  category: number | StoreCategory;
+  description?: string | null;
+  /**
+   * e.g., 245.00
+   */
+  price: string;
+  currency: string;
+  image: number | Media;
+  /**
+   * Check to feature this product prominently on the store page.
+   */
+  isFeatured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1361,6 +1398,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'reviews';
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'store-categories';
+        value: number | StoreCategory;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1980,6 +2025,31 @@ export interface ReviewsSelect<T extends boolean = true> {
   rating?: T;
   text?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "store-categories_select".
+ */
+export interface StoreCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  category?: T;
+  description?: T;
+  price?: T;
+  currency?: T;
+  image?: T;
+  isFeatured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
